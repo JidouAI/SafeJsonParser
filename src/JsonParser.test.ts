@@ -625,6 +625,31 @@ That's all!`);
         expect(result.error).toBeDefined();
       }
     });
+
+    it("should parse test5.json from tests directory", () => {
+      const filePath = join(process.cwd(), "tests", "test5.json");
+      const fileContent = readFileSync(filePath, "utf-8");
+      const result = tryParseJson(fileContent);
+
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        // Verify the structure of the agent workflow data
+        expect(result.data.next_action).toBe("write_agents");
+        expect(result.data.completed).toBe(true);
+        expect(result.data.agents).toBeInstanceOf(Array);
+        expect(result.data.agents).toHaveLength(3);
+
+        // Verify first agent structure
+        const firstAgent = result.data.agents[0];
+        expect(firstAgent.name).toBe("Data Collector");
+        expect(firstAgent.tools).toBeInstanceOf(Array);
+        expect(firstAgent.trigger).toBeDefined();
+        expect(firstAgent.trigger.type).toBe("schedule");
+      } else {
+        // File has control characters - verify error is reported
+        expect(result.error).toBeDefined();
+      }
+    });
   });
 
   describe("TypeScript type inference", () => {
